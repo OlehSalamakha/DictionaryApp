@@ -6,7 +6,6 @@
 			  android:minHeight="100dp"
 			  android:background="#E2D4D4"
 			  >
-
 	<GridLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -36,10 +35,7 @@
 			android:layout_height="35dp"
 			android:text="x"
 			/>
-
 		</GridLayout>
-
-
 
 	<TextView
 		android:id="@+id/TranslationTextView"
@@ -51,6 +47,4 @@
 		android:textColor="#433B3B"
 		android:textStyle="bold"
 		android:text="asdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdf"/>
-
-
 </LinearLayout>
