@@ -9,19 +9,22 @@
 	<GridLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginBottom="0dp"
 		android:columnCount="2"
 		android:rowCount="1">
+
 
 		<TextView
 			android:id="@+id/WordTextView"
 			android:layout_width="wrap_content"
-			android:minWidth="250dp"
-			android:layout_marginLeft="40dp"
+
+			android:minWidth="200dp"
+			android:layout_marginLeft="20dp"
 			android:layout_marginTop="10dp"
 			android:layout_marginBottom="5dp"
-			android:layout_height="20dp"
+			android:layout_height="30dp"
 			android:textStyle="bold"
-			android:textSize="20sp"
+			android:textSize="15sp"
 			android:text="Word"/>
 
 		<Button
@@ -30,21 +33,38 @@
 			android:layout_marginLeft="50dp"
 			android:layout_marginTop="10dp"
 			android:layout_marginBottom="5dp"
-
-
 			android:layout_height="35dp"
 			android:text="x"
 			/>
 		</GridLayout>
 
-	<TextView
-		android:id="@+id/TranslationTextView"
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="5dp"
-		android:layout_marginLeft="50dp"
-		android:textSize="18sp"
-		android:textColor="#433B3B"
-		android:textStyle="bold"
-		android:text="asdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdf"/>
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/TranslationTextView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="25dp"
+			android:layout_marginTop="0dp"
+			android:textSize="12sp"
+			android:textColor="#433B3B"
+			android:text="asdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdf"/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="right|bottom"
+			android:textColor="#F04C4C"
+			android:textSize="12sp"
+			android:layout_marginBottom="5dp"
+			android:layout_marginRight="8dp"
+			android:text="Passed 10/15"/>
+
+
+
+	</LinearLayout>
+
 </LinearLayout>
