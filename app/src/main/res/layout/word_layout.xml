@@ -5,6 +5,10 @@
               android:layout_height="wrap_content"
 			  android:minHeight="100dp"
 			  android:background="#E2D4D4"
+			  android:focusableInTouchMode="false"
+			  android:clickable="false"
+			  android:focusable="false"
+
 			  >
 	<GridLayout
 		android:layout_width="match_parent"

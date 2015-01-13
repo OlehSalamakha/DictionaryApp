@@ -1,11 +1,14 @@
 package com.example.olehsalamakha.d;
 
+import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -17,13 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ListActivity {
 
 	private TabHost myTabHost;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
+		Log.d("myTagddd", "This is myddd message");
 		setContentView(R.layout.activity_main);
 
 		myTabHost = (TabHost) findViewById(R.id.TabHost01);
@@ -53,11 +58,8 @@ public class MainActivity extends ActionBarActivity {
 
 		}
 
-
-		ListView lview = (ListView) findViewById(R.id.DictionaryListView);
 		WordsAdapter adapter = new WordsAdapter(this, words);
-
-		lview.setAdapter(adapter);
+		setListAdapter(adapter);
 
 	}
 
@@ -82,5 +84,13 @@ public class MainActivity extends ActionBarActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+
+
+
 	}
 }
