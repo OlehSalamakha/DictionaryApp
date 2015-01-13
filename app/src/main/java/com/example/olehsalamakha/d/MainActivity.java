@@ -1,10 +1,16 @@
 package com.example.olehsalamakha.d;
 
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TabHost;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -32,6 +38,18 @@ public class MainActivity extends ActionBarActivity {
 		spec.setContent(R.id.test);
 
 		myTabHost.addTab(spec);
+
+
+		Button b = (Button) findViewById(R.id.but);
+		b.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// Perform action on click
+
+				TextView vd = (TextView) findViewById(R.id.testView);
+				vd.setText("asdfasdf");
+
+			}
+		});
 
 	}
 
