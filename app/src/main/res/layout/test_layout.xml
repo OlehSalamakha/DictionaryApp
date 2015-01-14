@@ -13,7 +13,7 @@
 	<Button
 		android:layout_width="25dp"
 		android:layout_height="25dp"
-		android:background="@drawable/button"
+		android:background="@drawable/round_button"
 		android:gravity="center_vertical|center_horizontal"
 		android:text="hello"
 		android:textColor="#fff" />

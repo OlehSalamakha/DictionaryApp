@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="yellow1">#FFDE00</color>
-	<color name="yellow2">#FAE033</color>
 
-	<color name="grey05">#8B897D</color>
 
-	<color name="orange4">#F56632</color>
-	<color name="orange5">#BC3504</color>
+	<color name="grey1">#ACACAC</color>
+	<color name="grey2">#979797</color>
 
-	<color name="blue2">#3371DB</color>
-	<color name="blue25">#0E429B</color>
+	<color name="red1">#F65959</color>
+	<color name="red2">#F53232</color>
+
+
 </resources>
