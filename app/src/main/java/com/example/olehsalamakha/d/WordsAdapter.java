@@ -1,11 +1,20 @@
 package com.example.olehsalamakha.d;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import junit.framework.Test;
+
+
+import static android.support.v4.content.ContextCompat.startActivities;
 
 
 /**
@@ -28,5 +37,13 @@ public class WordsAdapter extends ArrayAdapter {
 		return v;
 	}
 
+	@Override
+	public boolean areAllItemsEnabled() {
+		return true;
+	}
 
+	@Override
+	public boolean isEnabled(int position) {
+		return true;
+	}
 }

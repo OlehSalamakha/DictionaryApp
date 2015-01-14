@@ -5,9 +5,10 @@
               android:layout_height="wrap_content"
 			  android:minHeight="100dp"
 			  android:background="#E2D4D4"
-			  android:focusableInTouchMode="false"
-			  android:clickable="false"
-			  android:focusable="false"
+              android:focusable="false"
+              android:clickable="false"
+              android:descendantFocusability="blocksDescendants"
+
 
 			  >
 	<GridLayout
@@ -15,7 +16,9 @@
 		android:layout_height="wrap_content"
 		android:layout_marginBottom="0dp"
 		android:columnCount="2"
-		android:rowCount="1">
+		android:rowCount="1"
+		android:focusable="false"
+		android:clickable="false">
 
 
 		<TextView
@@ -29,7 +32,9 @@
 			android:layout_height="30dp"
 			android:textStyle="bold"
 			android:textSize="15sp"
-			android:text="Word"/>
+			android:text="Word"
+			android:focusable="false"
+			android:clickable="false"/>
 
 		<Button
 			android:id="@+id/RemoveWordButton"
@@ -39,7 +44,8 @@
 			android:layout_marginTop="10dp"
 			android:layout_marginBottom="5dp"
 			android:text="x"
-			android:textSize="2sp"
+			android:textSize="10sp"
+			android:textColor="@color/white"
 		    android:background="@drawable/round_button"
 			/>
 		</GridLayout>
@@ -47,7 +53,9 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical">
+		android:orientation="vertical"
+		android:focusable="false"
+		android:clickable="false">
 
 		<TextView
 			android:id="@+id/TranslationTextView"
@@ -57,6 +65,8 @@
 			android:layout_marginTop="0dp"
 			android:textSize="12sp"
 			android:textColor="#433B3B"
+			android:focusable="false"
+			android:clickable="false"
 			android:text="asdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdf"/>
 
 		<TextView
@@ -67,6 +77,8 @@
 			android:textSize="12sp"
 			android:layout_marginBottom="5dp"
 			android:layout_marginRight="8dp"
+			android:focusable="false"
+			android:clickable="false"
 			android:text="Passed 10/15"/>
 
 

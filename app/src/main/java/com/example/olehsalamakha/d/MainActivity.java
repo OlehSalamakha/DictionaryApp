@@ -1,18 +1,22 @@
 package com.example.olehsalamakha.d;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.DialogInterface;
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -20,34 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends Activity {
 
 	private TabHost mTabhost;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
-		Log.d("myTagddd", "This is myddd message");
 		setContentView(R.layout.activity_main);
-
-		mTabhost = (TabHost) findViewById(R.id.TabHost01);
-
-		mTabhost.setup();
-
-		TabHost.TabSpec spec = mTabhost.newTabSpec("Dictionary");
-		spec.setIndicator("Dictionary");
-		spec.setContent(R.id.dict);
-
-		mTabhost.addTab(spec);
-
-
-		spec = mTabhost.newTabSpec("Test");
-		spec.setIndicator("Test");
-		spec.setContent(R.id.test);
-
-		mTabhost.addTab(spec);
-
+		createTabHost();
 
 		Word[] words = new Word[10];
 
@@ -58,11 +43,17 @@ public class MainActivity extends ListActivity {
 
 		}
 
+		ListView dictionaryView = (ListView) findViewById(R.id.dictionary_list_view);
 		WordsAdapter adapter = new WordsAdapter(this, words);
-		setListAdapter(adapter);
+		dictionaryView.setAdapter(adapter);
+		dictionaryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				view.setSelected(true);
 
+			}
+		});
 	}
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -86,11 +77,20 @@ public class MainActivity extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
 
+	private void createTabHost() {
+		mTabhost = (TabHost) findViewById(R.id.TabHost01);
+		mTabhost.setup();
 
+		TabHost.TabSpec spec = mTabhost.newTabSpec("Dictionary");
+		spec.setIndicator("Dictionary");
+		spec.setContent(R.id.dict);
+		mTabhost.addTab(spec);
 
+		spec = mTabhost.newTabSpec("Test");
+		spec.setIndicator("Test");
+		spec.setContent(R.id.test);
+		mTabhost.addTab(spec);
 	}
+
 }
