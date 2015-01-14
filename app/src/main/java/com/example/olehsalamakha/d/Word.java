@@ -7,20 +7,19 @@ import java.util.List;
  */
 public class Word {
 
+	private String mWord;
+	private List<String> mTranslationsList;
 	public Word(String word, List<String> translations) {
-		word_ = word;
-		translations_ = translations;
+		mWord = word;
+		mTranslationsList = translations;
 	}
 
 
 	public String getWord() {
-		return word_;
+		return mWord;
 	}
 
 	public List<String> getTranslations() {
-		return translations_;
+		return mTranslationsList;
 	}
-
-	private String word_;
-	private List<String> translations_;
 }

@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainActivity extends ListActivity {
 
-	private TabHost myTabHost;
+	private TabHost mTabhost;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,22 +31,22 @@ public class MainActivity extends ListActivity {
 		Log.d("myTagddd", "This is myddd message");
 		setContentView(R.layout.activity_main);
 
-		myTabHost = (TabHost) findViewById(R.id.TabHost01);
+		mTabhost = (TabHost) findViewById(R.id.TabHost01);
 
-		myTabHost.setup();
+		mTabhost.setup();
 
-		TabHost.TabSpec spec = myTabHost.newTabSpec("Dictionary");
+		TabHost.TabSpec spec = mTabhost.newTabSpec("Dictionary");
 		spec.setIndicator("Dictionary");
 		spec.setContent(R.id.dict);
 
-		myTabHost.addTab(spec);
+		mTabhost.addTab(spec);
 
 
-		spec = myTabHost.newTabSpec("Test");
+		spec = mTabhost.newTabSpec("Test");
 		spec.setIndicator("Test");
 		spec.setContent(R.id.test);
 
-		myTabHost.addTab(spec);
+		mTabhost.addTab(spec);
 
 
 		Word[] words = new Word[10];
