@@ -21,7 +21,7 @@ public class DBHelper extends  SQLiteOpenHelper {
 	public static final String WORDTABLENAME = "Words";
 	public static final String TRANSLATIONSTABLENAME = "Translations";
 
-	private int mLastSelectedWordId =-1;
+	private int mCountSelectedWords = 0;
 
 
 	public DBHelper(Context context) {
@@ -71,35 +71,53 @@ public class DBHelper extends  SQLiteOpenHelper {
 	}
 
 	public int getCountOfWords() {
-		String countQuery = "SELECT  * FROM " + WORDTABLENAME;
+		String countQuery = "SELECT COUNT(*) FROM " + WORDTABLENAME;
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor cursor = db.rawQuery(countQuery, null);
-		int count = cursor.getCount();
+		cursor.moveToFirst();
+		int count = cursor.getInt(0);
 		cursor.close();
 		return count;
 	}
 
-//	public List<Word> selectWords(int count) {
-//		SQLiteDatabase db = this.getReadableDatabase();
-//
-//
-//	}
 
-	public String select1() {
-		SQLiteDatabase db = this.getReadableDatabase();
 
-		String query = "SELECT  * FROM " + WORDTABLENAME;
-		Cursor cursor = db.rawQuery(query, null);
 
-		cursor.moveToLast();
-		String t=cursor.getString(1);
-		return t;
+
+	public ArrayList<Word> selectWords(int count, int offset) {
+		String query = "SELECT * FROM " + WORDTABLENAME + " LIMIT " + Integer.toString(count) + " OFFSET " + Integer.toString(offset);
+		Cursor cursor = select(query);
+		ArrayList<Word> words = new ArrayList<Word>();
+
+		while (cursor.moveToNext()) {
+			int idWord = cursor.getInt(0);
+			String word =cursor.getString(1);
+			int countAnswer = cursor.getInt(2);
+			int countValidAnswer = cursor.getInt(3);
+			ArrayList<String> translations = selectTranslations(idWord);
+
+			words.add(new Word(word, translations, countAnswer, countValidAnswer));
+		}
+		mCountSelectedWords += cursor.getCount();
+		return words;
+	}
+
+	private ArrayList<String> selectTranslations(int idWord) {
+		String query = "SELECT * FROM " + TRANSLATIONSTABLENAME + " WHERE " + "id_word=" + Integer.toString(idWord);
+		Cursor cursor = select(query);
+
+		ArrayList<String> translations = new ArrayList<String>();
+		while (cursor.moveToNext()) {
+			translations.add(cursor.getString(1));
+		}
+		return translations;
 	}
 
 
-
-
-
-
+	private Cursor select(String query) {
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery(query, null);
+		return cursor;
+	}
 
 }

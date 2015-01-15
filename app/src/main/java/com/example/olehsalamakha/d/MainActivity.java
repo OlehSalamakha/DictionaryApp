@@ -1,16 +1,15 @@
 package com.example.olehsalamakha.d;
-
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
-
-
 import java.util.ArrayList;
 
 
@@ -18,13 +17,28 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
 
 	private TabHost mTabhost;
+	private ListView mDictionaryListView;
+	private WordsAdapter mAdapter;
 
-
-	private AdapterView.OnItemClickListener mDictionaryItemClickListener = new AdapterView.OnItemClickListener() {
+	private AdapterView.OnItemClickListener mDictionaryItemClickListener =
+			new AdapterView.OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			view.setSelected(true);
+
+
 		}
+	};
+
+	private View.OnClickListener mDeleteButtonClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			final int position = mDictionaryListView.getPositionForView((View) v.getParent());
+			//datalist.remove(position);
+			mAdapter.notifyDataSetChanged();
+		}
+
+
 	};
 
 	@Override
@@ -42,10 +56,9 @@ public class MainActivity extends Activity {
 
 		}
 
-		ListView dictionaryView = (ListView) findViewById(R.id.dictionary_list_view);
-		WordsAdapter adapter = new WordsAdapter(this, words);
-		dictionaryView.setAdapter(adapter);
-		dictionaryView.setOnItemClickListener(mDictionaryItemClickListener);
+		createListView(words);
+
+		startActivity(new Intent(this, TestDbActivity.class));
 	}
 
 	@Override
@@ -84,6 +97,13 @@ public class MainActivity extends Activity {
 		spec.setIndicator("Test");
 		spec.setContent(R.id.test);
 		mTabhost.addTab(spec);
+	}
+
+	private void createListView(Word[] words) {
+		mDictionaryListView = (ListView) findViewById(R.id.dictionary_list_view);
+		mAdapter = new WordsAdapter(this, words);
+		mDictionaryListView.setAdapter(mAdapter);
+		mDictionaryListView.setOnItemClickListener(mDictionaryItemClickListener);
 	}
 
 }

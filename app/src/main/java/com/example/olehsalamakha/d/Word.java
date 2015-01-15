@@ -11,9 +11,11 @@ public class Word {
 	private List<String> mTranslationsList;
 	private int mCountAnswer = 0;
 	private int mCountValidAnswer = 0;
-	public Word(String word, List<String> translations) {
+	public Word(String word, List<String> translations, int countAnswer, int countValidAnswer) {
 		mWord = word;
 		mTranslationsList = translations;
+		mCountAnswer = countAnswer;
+		mCountValidAnswer =
 	}
 
 
