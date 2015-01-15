@@ -74,15 +74,9 @@ public class DBHelper extends  SQLiteOpenHelper {
 				throw new SQLException("Error insert intro translations");
 			}
 			contentValues.clear();
-
 		}
-
-
-
 		return true;
 	}
-
-
 
 	public int getCountOfWords() {
 		String countQuery = "SELECT COUNT(*) FROM " + WORDTABLENAME;
@@ -124,7 +118,7 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 		ArrayList<String> translations = new ArrayList<String>();
 		while (cursor.moveToNext()) {
-			translations.add(cursor.getString(1));
+			translations.add(cursor.getString(2));
 		}
 		return translations;
 	}

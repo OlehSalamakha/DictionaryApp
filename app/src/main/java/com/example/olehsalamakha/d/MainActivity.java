@@ -3,6 +3,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TabHost;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 
@@ -47,18 +50,42 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		createTabHost();
 
-		Word[] words = new Word[10];
 
-		for (int i=0; i<10; i++) {
-			ArrayList<String> translations = new ArrayList<String>();
-			translations.add("ручка");
-			Word w = new Word("pen", translations);
 
-		}
+		DBHelper db = new DBHelper(this);
+
+//
+//
+//		Word[] words = new Word[10];
+//		for (int i=0; i<10; i++) {
+//			ArrayList<String> t = new ArrayList<String>();
+//			t.add("adfasdf");
+//			words[i] = new Word("adfasf", t);
+//
+//			try {
+//				db.insertWord(words[i]);
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+
+//		try {
+//			db.insertWord(words[0]);
+//		}
+//		catch (SQLException e) {
+//			startActivity(new Intent(this, TestDbActivity.class));
+//			Log.d("exeption", "sql exception");
+//		}
+
+
+		ArrayList<Word> lWord = db.selectWords();
+		Word[] words = new Word[lWord.size()];
+		words = lWord.toArray(words);
+
 
 		createListView(words);
 
-		startActivity(new Intent(this, TestDbActivity.class));
+
 	}
 
 	@Override

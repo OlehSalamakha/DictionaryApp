@@ -9,6 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 
 /**
  * Created by olehsalamakha on 1/13/15.
@@ -28,7 +31,18 @@ public class WordsAdapter extends ArrayAdapter {
 		View v = mInflater.inflate(R.layout.word_layout, parent, false);
 
 		TextView wordView = (TextView) v.findViewById(R.id.WordTextView);
-		wordView.setText("blabla");
+		wordView.setText(mWords[position].getWord());
+
+		wordView = (TextView) v.findViewById(R.id.TranslationTextView);
+
+		String translation = "";
+		ArrayList<String> translations = mWords[position].getTranslations();
+		for (int i=0; i<translations.size(); i++) {
+			translation += translations.get(i) + "\n";
+		}
+
+		wordView.setText(translation);
+
 
 
 		return v;

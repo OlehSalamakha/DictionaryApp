@@ -1,5 +1,6 @@
 package com.example.olehsalamakha.d;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,14 +9,19 @@ import java.util.List;
 public class Word {
 
 	private String mWord;
-	private List<String> mTranslationsList;
+	private ArrayList<String> mTranslationsList;
 	private int mCountAnswer = 0;
 	private int mCountValidAnswer = 0;
-	public Word(String word, List<String> translations, int countAnswer, int countValidAnswer) {
+	public Word(String word, ArrayList<String> translations, int countAnswer, int countValidAnswer) {
 		mWord = word;
 		mTranslationsList = translations;
 		mCountAnswer = countAnswer;
-		mCountValidAnswer =
+		mCountValidAnswer = countValidAnswer;
+	}
+
+	public Word(String word, ArrayList<String> translations) {
+		mWord = word;
+		mTranslationsList = translations;
 	}
 
 
@@ -23,7 +29,7 @@ public class Word {
 		return mWord;
 	}
 
-	public List<String> getTranslations() {
+	public ArrayList<String> getTranslations() {
 		return mTranslationsList;
 	}
 
