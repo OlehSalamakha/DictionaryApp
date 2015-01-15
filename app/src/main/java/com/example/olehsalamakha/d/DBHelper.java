@@ -88,14 +88,10 @@ public class DBHelper extends  SQLiteOpenHelper {
 		return count;
 	}
 
-
-
-
-
 	public ArrayList<Word> selectWords() {
 		int count = 10;
-		int offset = 0;
-		String query = "SELECT * FROM " + WORDTABLENAME + " LIMIT " + Integer.toString(count) + " OFFSET " + Integer.toString(offset);
+
+		String query = "SELECT * FROM " + WORDTABLENAME + " LIMIT " + Integer.toString(count) + " OFFSET " + Integer.toString(mCountSelectedWords);
 		Cursor cursor = select(query);
 		ArrayList<Word> words = new ArrayList<Word>();
 

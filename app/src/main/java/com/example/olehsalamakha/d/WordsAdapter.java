@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import java.lang.reflect.Array;
@@ -19,10 +20,11 @@ import java.util.ArrayList;
 public class WordsAdapter extends ArrayAdapter {
 
 	private LayoutInflater mInflater;
-	private Word[] mWords;
+	private ArrayList<Word> mWords;
 
-	public WordsAdapter(Activity activity, Word[] words) {
+	public WordsAdapter(Activity activity, ArrayList<Word> words) {
 		super(activity, R.layout.word_layout, words);
+
 		mWords = words;
 		mInflater = activity.getWindow().getLayoutInflater();
 	}
@@ -31,12 +33,12 @@ public class WordsAdapter extends ArrayAdapter {
 		View v = mInflater.inflate(R.layout.word_layout, parent, false);
 
 		TextView wordView = (TextView) v.findViewById(R.id.WordTextView);
-		wordView.setText(mWords[position].getWord());
+		wordView.setText(mWords.get(position).getWord());
 
 		wordView = (TextView) v.findViewById(R.id.TranslationTextView);
 
 		String translation = "";
-		ArrayList<String> translations = mWords[position].getTranslations();
+		ArrayList<String> translations = mWords.get(position).getTranslations();
 		for (int i=0; i<translations.size(); i++) {
 			translation += translations.get(i) + "\n";
 		}

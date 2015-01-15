@@ -7,10 +7,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TabHost;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,6 +27,9 @@ public class MainActivity extends Activity {
 	private TabHost mTabhost;
 	private ListView mDictionaryListView;
 	private WordsAdapter mAdapter;
+	private DBHelper mDbHelper;
+	private ArrayList<Word> mWords = new ArrayList<Word>();
+	private int mCountAllWords = 0;
 
 	private AdapterView.OnItemClickListener mDictionaryItemClickListener =
 			new AdapterView.OnItemClickListener() {
@@ -33,57 +41,43 @@ public class MainActivity extends Activity {
 		}
 	};
 
-	private View.OnClickListener mDeleteButtonClickListener = new View.OnClickListener() {
+
+	private AbsListView.OnScrollListener onAnswersScrolled = new AbsListView.OnScrollListener() {
+
 		@Override
-		public void onClick(View v) {
-			final int position = mDictionaryListView.getPositionForView((View) v.getParent());
-			//datalist.remove(position);
-			mAdapter.notifyDataSetChanged();
+		public void onScrollStateChanged(AbsListView view, int scrollState) {
+			// not used
 		}
 
+		@Override
+		public void onScroll(AbsListView view, int firstVisibleItem,
+		                     int visibleItemCount, int totalItemCount) {
 
+			//check if position of listview is in bottom
+			if (mDictionaryListView.getLastVisiblePosition() == mDictionaryListView.getCount() - 1
+					&& mDictionaryListView.getChildAt(mDictionaryListView.getChildCount() - 1).getBottom()
+					<= mDictionaryListView.getHeight()) {
+
+
+				if (mDictionaryListView.getCount() < mCountAllWords) {
+					mAdapter.addAll(mDbHelper.selectWords());
+					mAdapter.notifyDataSetChanged();
+				}
+			}
+		}
 	};
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		createTabHost();
-
-
-
-		DBHelper db = new DBHelper(this);
-
-//
-//
-//		Word[] words = new Word[10];
-//		for (int i=0; i<10; i++) {
-//			ArrayList<String> t = new ArrayList<String>();
-//			t.add("adfasdf");
-//			words[i] = new Word("adfasf", t);
-//
-//			try {
-//				db.insertWord(words[i]);
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-
-//		try {
-//			db.insertWord(words[0]);
-//		}
-//		catch (SQLException e) {
-//			startActivity(new Intent(this, TestDbActivity.class));
-//			Log.d("exeption", "sql exception");
-//		}
-
-
-		ArrayList<Word> lWord = db.selectWords();
-		Word[] words = new Word[lWord.size()];
-		words = lWord.toArray(words);
-
-
-		createListView(words);
+		mDbHelper = new DBHelper(this);
+		mCountAllWords = mDbHelper.getCountOfWords();
+		mWords.addAll(mDbHelper.selectWords());
+		createListView();
+		mDictionaryListView.setOnScrollListener(onAnswersScrolled);
 
 
 	}
@@ -126,11 +120,12 @@ public class MainActivity extends Activity {
 		mTabhost.addTab(spec);
 	}
 
-	private void createListView(Word[] words) {
+	private void createListView() {
 		mDictionaryListView = (ListView) findViewById(R.id.dictionary_list_view);
-		mAdapter = new WordsAdapter(this, words);
+		mAdapter = new WordsAdapter(this, mWords);
 		mDictionaryListView.setAdapter(mAdapter);
 		mDictionaryListView.setOnItemClickListener(mDictionaryItemClickListener);
 	}
+
 
 }
