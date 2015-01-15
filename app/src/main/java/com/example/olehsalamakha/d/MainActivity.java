@@ -37,6 +37,8 @@ public class MainActivity extends Activity {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			view.setSelected(true);
 
+			startActivity(new Intent(parent.getContext(), WordActivity.class));
+
 		}
 	};
 

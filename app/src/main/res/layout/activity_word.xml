@@ -32,7 +32,8 @@
 		android:layout_height="20dp"
 		android:layout_margin="10dp"
 		android:textSize="11sp"
-		android:textColor="#FF5757"/>
+		android:textColor="#FF5757"
+		android:id="@+id/word_information_text_view"/>
 </LinearLayout>
 
 
