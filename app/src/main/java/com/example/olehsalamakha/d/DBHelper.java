@@ -2,6 +2,7 @@ package com.example.olehsalamakha.d; /**
  * Created by olehsalamakha on 1/14/15.
  */
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -30,8 +31,9 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("CREATE TABLE Words (id INTEGER PRIMARY KEY AUTOINCREMENT, word text, count_answer integer, count_valid_answer integer);" +
-				"create table Translations(id INTEGER PRIMARY KEY AUTOINCREMENT, id_word integer,  translation text);");
+		db.execSQL("CREATE TABLE Words (id INTEGER PRIMARY KEY AUTOINCREMENT, word text, count_answer integer, count_valid_answer integer);");
+		db.execSQL("create table Translations (id INTEGER PRIMARY KEY AUTOINCREMENT, id_word integer,  translation text);");
+
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class DBHelper extends  SQLiteOpenHelper {
 	}
 
 
-	public Boolean insertWord(Word word) {
+	public Boolean insertWord(Word word) throws SQLException {
 		String w = word.getWord();
 		int countAnswer = word.getCountAnswer();
 		int countValidAnswer = word.getCountValidAnswer();
@@ -57,18 +59,30 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 
 		long id = db.insert(WORDTABLENAME, null, contentValues);
+		if (id == -1) {
+			throw new SQLException("Error insert into words");
+		}
 		contentValues.clear();
 		List<String> translations = word.getTranslations();
 
 		String idWord = Long.toString(id);
 		for (int i=0; i<translations.size(); i++) {
-			contentValues.put(idWord, translations.get(i));
+			contentValues.put("id_word", idWord);
+			contentValues.put("translation", translations.get(i));
+			id = db.insert(TRANSLATIONSTABLENAME, null, contentValues);
+			if (id == -1) {
+				throw new SQLException("Error insert intro translations");
+			}
+			contentValues.clear();
 
 		}
 
-		db.insert(TRANSLATIONSTABLENAME, null, contentValues);
+
+
 		return true;
 	}
+
+
 
 	public int getCountOfWords() {
 		String countQuery = "SELECT COUNT(*) FROM " + WORDTABLENAME;
@@ -84,7 +98,9 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 
 
-	public ArrayList<Word> selectWords(int count, int offset) {
+	public ArrayList<Word> selectWords() {
+		int count = 10;
+		int offset = 0;
 		String query = "SELECT * FROM " + WORDTABLENAME + " LIMIT " + Integer.toString(count) + " OFFSET " + Integer.toString(offset);
 		Cursor cursor = select(query);
 		ArrayList<Word> words = new ArrayList<Word>();
