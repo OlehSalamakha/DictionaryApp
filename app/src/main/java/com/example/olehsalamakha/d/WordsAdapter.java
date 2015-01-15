@@ -42,10 +42,10 @@ public class WordsAdapter extends ArrayAdapter {
 		for (int i=0; i<translations.size(); i++) {
 			translation += translations.get(i) + "\n";
 		}
-
 		wordView.setText(translation);
 
-
+		TextView informationView = (TextView) v.findViewById(R.id.item_word_information);
+		informationView.setText("Passed " + mWords.get(position).getCountAnswer() + "\\" + mWords.get(position).getCountValidAnswer());
 
 		return v;
 	}

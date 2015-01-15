@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
 
 			startActivity(new Intent(parent.getContext(), WordActivity.class));
 
+
 		}
 	};
 

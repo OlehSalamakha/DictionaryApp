@@ -69,6 +69,7 @@
 			android:text="asdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdfasdfasd\nasdfasdf"/>
 
 		<TextView
+			android:id="@+id/item_word_information"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="right|bottom"
