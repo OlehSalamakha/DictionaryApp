@@ -36,6 +36,10 @@
             android:name=".TestDbActivity"
             android:label="@string/title_activity_test_db" >
         </activity>
+        <activity
+            android:name=".WordActivity"
+            android:label="@string/title_activity_word" >
+        </activity>
     </application>
 
 </manifest>

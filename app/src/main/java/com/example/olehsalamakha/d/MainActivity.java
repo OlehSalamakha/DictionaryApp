@@ -37,12 +37,11 @@ public class MainActivity extends Activity {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			view.setSelected(true);
 
-
 		}
 	};
 
 
-	private AbsListView.OnScrollListener onAnswersScrolled = new AbsListView.OnScrollListener() {
+	private AbsListView.OnScrollListener mDictionaryScrollListener = new AbsListView.OnScrollListener() {
 
 		@Override
 		public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -52,13 +51,10 @@ public class MainActivity extends Activity {
 		@Override
 		public void onScroll(AbsListView view, int firstVisibleItem,
 		                     int visibleItemCount, int totalItemCount) {
-
 			//check if position of listview is in bottom
 			if (mDictionaryListView.getLastVisiblePosition() == mDictionaryListView.getCount() - 1
 					&& mDictionaryListView.getChildAt(mDictionaryListView.getChildCount() - 1).getBottom()
 					<= mDictionaryListView.getHeight()) {
-
-
 				if (mDictionaryListView.getCount() < mCountAllWords) {
 					mAdapter.addAll(mDbHelper.selectWords());
 					mAdapter.notifyDataSetChanged();
@@ -77,7 +73,7 @@ public class MainActivity extends Activity {
 		mCountAllWords = mDbHelper.getCountOfWords();
 		mWords.addAll(mDbHelper.selectWords());
 		createListView();
-		mDictionaryListView.setOnScrollListener(onAnswersScrolled);
+		mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
 
 
 	}
