@@ -1,25 +1,31 @@
 package com.example.olehsalamakha.d;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TabHost;
-import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
+import java.io.BufferedReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
+import android.app.ActionBar;
+import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
@@ -37,9 +43,17 @@ public class MainActivity extends Activity {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			view.setSelected(true);
 
-			startActivity(new Intent(parent.getContext(), WordActivity.class));
+		}
+	};
 
-
+	private View.OnClickListener mAddClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Intent i = new Intent(v.getContext(), AddWordActivity.class);
+			TextView tView = (TextView) findViewById(R.id.word_edit_text);
+			String word = tView.getText().toString();
+			i.putExtra("word", word);
+			startActivity(i);
 		}
 	};
 
@@ -70,21 +84,29 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+//
+
+
+
 		setContentView(R.layout.activity_main);
+
+		Button addBtn = (Button) findViewById(R.id.add_word_button);
+		addBtn.setOnClickListener(mAddClickListener);
 		createTabHost();
-		mDbHelper = new DBHelper(this);
+		mDbHelper = DBHelper.getInstance(this);
+
+
+
 		mCountAllWords = mDbHelper.getCountOfWords();
 		mWords.addAll(mDbHelper.selectWords());
 		createListView();
 		mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
 
-
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_main, menu);
+
 		return true;
 	}
 
@@ -96,9 +118,9 @@ public class MainActivity extends Activity {
 		int id = item.getItemId();
 
 		//noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings) {
-			return true;
-		}
+//		if (id == R.id.action_settings) {
+//			return true;
+//		}
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -125,6 +147,7 @@ public class MainActivity extends Activity {
 		mDictionaryListView.setAdapter(mAdapter);
 		mDictionaryListView.setOnItemClickListener(mDictionaryItemClickListener);
 	}
+
 
 
 }

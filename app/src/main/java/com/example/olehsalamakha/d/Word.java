@@ -22,6 +22,12 @@ public class Word implements Parcelable {
 		mCountValidAnswer = countValidAnswer;
 	}
 
+	public Word(String word, String translation) {
+		mWord = word;
+		mTranslationsList = new ArrayList<>();
+		mTranslationsList.add(translation);
+	}
+
 	public Word(String word, ArrayList<String> translations) {
 		mWord = word;
 		mTranslationsList = translations;
@@ -34,6 +40,7 @@ public class Word implements Parcelable {
 		this.mWord = data[0];
 		this.mCountAnswer = Integer.parseInt(data[1]);
 		this.mCountValidAnswer = Integer.parseInt(data[2]);
+
 
 		for (int i=3; i<data.length; i++) {
 			this.mTranslationsList.add(data[i]);
@@ -83,16 +90,13 @@ public class Word implements Parcelable {
 		}
 
 		dest.writeStringArray(dataArr);
-
-
-
 	}
 
-	public static final Parcelable.Creator<Word> CREATOR= new Parcelable.Creator<Word>() {
 
+	public static final Parcelable.Creator<Word> CREATOR= new Parcelable.Creator<Word>() {
 		@Override
 		public Word createFromParcel(Parcel source) {
-			return new Word(source);  //using parcelable constructor
+			return new Word(source);
 		}
 
 		@Override

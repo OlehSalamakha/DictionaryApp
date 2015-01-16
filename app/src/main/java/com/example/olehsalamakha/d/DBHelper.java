@@ -23,9 +23,17 @@ public class DBHelper extends  SQLiteOpenHelper {
 	public static final String TRANSLATIONSTABLENAME = "Translations";
 
 	private int mCountSelectedWords = 0;
+	private static DBHelper mDbHelper = null;
+	public static DBHelper getInstance(Context context) {
+		if (mDbHelper == null) {
+			mDbHelper = new DBHelper(context);
+		}
+
+		return mDbHelper;
+	}
 
 
-	public DBHelper(Context context) {
+	private DBHelper(Context context) {
 		super(context, DATABASENAME , null, 1);
 	}
 
@@ -105,10 +113,11 @@ public class DBHelper extends  SQLiteOpenHelper {
 			words.add(new Word(word, translations, countAnswer, countValidAnswer));
 		}
 		mCountSelectedWords += cursor.getCount();
+
 		return words;
 	}
 
-	private ArrayList<String> selectTranslations(int idWord) {
+	private static ArrayList<String> selectTranslations(int idWord) {
 		String query = "SELECT * FROM " + TRANSLATIONSTABLENAME + " WHERE " + "id_word=" + Integer.toString(idWord);
 		Cursor cursor = select(query);
 
@@ -120,8 +129,8 @@ public class DBHelper extends  SQLiteOpenHelper {
 	}
 
 
-	private Cursor select(String query) {
-		SQLiteDatabase db = this.getReadableDatabase();
+	private static Cursor select(String query) {
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery(query, null);
 		return cursor;
 	}
