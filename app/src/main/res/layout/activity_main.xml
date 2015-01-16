@@ -2,7 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-            >
+              android:orientation="vertical"
+	>
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<EditText
+			android:id="@+id/word_edit_text"
+			android:layout_width="wrap_content"
+			android:minWidth="50dp"
+			android:layout_height="wrap_content"
+			android:textSize="10sp"
+			android:textStyle="bold"
+			android:layout_margin="5dp"/>
+
+		<Button
+			android:id="@+id/translate_button"
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:layout_margin="5dp"
+			android:text="translate"/>
+
+		<TextView
+			android:id="@+id/translated_word_view"
+			android:layout_width="wrap_content"
+			android:minWidth="50dp"
+			android:layout_height="wrap_content"
+			android:textSize="10sp"
+			android:textStyle="bold"
+			android:layout_margin="5dp"/>
+
+		<Button
+			android:id="@+id/add_button"
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:layout_margin="5dp"
+			android:text="Add"/>
+	</LinearLayout>
 	<TabHost
 		android:id="@+id/TabHost01"
 		android:layout_width="fill_parent"

@@ -50,9 +50,6 @@ public class WordsAdapter extends ArrayAdapter {
 		return v;
 	}
 
-
-
-
 	@Override
 	public boolean areAllItemsEnabled() {
 		return true;

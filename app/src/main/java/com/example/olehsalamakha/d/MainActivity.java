@@ -1,31 +1,23 @@
 package com.example.olehsalamakha.d;
-import android.app.ActionBar;
 import android.app.Activity;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.TabHost;
 
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import android.app.ActionBar;
 import android.widget.TextView;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 
 public class MainActivity extends Activity {
@@ -37,6 +29,11 @@ public class MainActivity extends Activity {
 	private ArrayList<Word> mWords = new ArrayList<Word>();
 	private int mCountAllWords = 0;
 
+	private Button mTranslateBtn;
+	private Button mAddBtn;
+	private EditText mWordEdit;
+	private TextView mTranslatedWordView;
+
 	private AdapterView.OnItemClickListener mDictionaryItemClickListener =
 			new AdapterView.OnItemClickListener() {
 		@Override
@@ -46,17 +43,28 @@ public class MainActivity extends Activity {
 		}
 	};
 
-	private View.OnClickListener mAddClickListener = new View.OnClickListener() {
+	private View.OnClickListener mTranslateBtnClick = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			Intent i = new Intent(v.getContext(), AddWordActivity.class);
-			TextView tView = (TextView) findViewById(R.id.word_edit_text);
-			String word = tView.getText().toString();
-			i.putExtra("word", word);
-			startActivity(i);
+			String word = mWordEdit.getText().toString();
+			String translatedWord = translate(word);
+			mTranslatedWordView.setText(translatedWord);
 		}
 	};
 
+	private View.OnClickListener mAddBtnClick = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			try {
+				Word w = new Word(mWordEdit.getText().toString(), mTranslatedWordView.getText().toString());
+				mDbHelper.insertWord(w);
+				mAdapter.insert(w, 0);
+				mAdapter.notifyDataSetChanged();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	};
 
 	private AbsListView.OnScrollListener mDictionaryScrollListener = new AbsListView.OnScrollListener() {
 
@@ -84,23 +92,30 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//
-
-
 
 		setContentView(R.layout.activity_main);
 
-		Button addBtn = (Button) findViewById(R.id.add_word_button);
-		addBtn.setOnClickListener(mAddClickListener);
 		createTabHost();
+
 		mDbHelper = DBHelper.getInstance(this);
-
-
-
 		mCountAllWords = mDbHelper.getCountOfWords();
-		mWords.addAll(mDbHelper.selectWords());
-		createListView();
-		mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
+		if (mCountAllWords > 0) {
+			mWords.addAll(mDbHelper.selectWords());
+			createListView();
+			mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
+		}
+
+		mTranslateBtn = (Button) findViewById(R.id.translate_button);
+		mTranslateBtn.setOnClickListener(mTranslateBtnClick);
+
+		mAddBtn = (Button) findViewById(R.id.add_button);
+		mAddBtn.setOnClickListener(mAddBtnClick);
+
+		mWordEdit = (EditText) findViewById(R.id.word_edit_text);
+		mWordEdit.setText("pen");
+
+		mTranslatedWordView = (TextView) findViewById(R.id.translated_word_view);
+
 
 	}
 
@@ -146,6 +161,35 @@ public class MainActivity extends Activity {
 		mAdapter = new WordsAdapter(this, mWords);
 		mDictionaryListView.setAdapter(mAdapter);
 		mDictionaryListView.setOnItemClickListener(mDictionaryItemClickListener);
+	}
+
+	private String translate(final String word) {
+		final Translator t = new Translator();
+
+		Thread thread = new Thread(new Runnable(){
+			@Override
+			public void run() {
+				try {
+					t.translate(word);
+				} catch (ParserConfigurationException e) {
+					e.printStackTrace();
+
+				} catch (SAXException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		return t.getTranslatedWord();
 	}
 
 
