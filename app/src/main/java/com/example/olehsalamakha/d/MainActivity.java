@@ -1,6 +1,7 @@
 package com.example.olehsalamakha.d;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,12 +23,15 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class MainActivity extends Activity {
 
+	static final String TAG = "MainActivity";
+
 	private TabHost mTabhost;
 	private ListView mDictionaryListView;
 	private WordsAdapter mAdapter;
 	private DBHelper mDbHelper;
 	private ArrayList<Word> mWords = new ArrayList<Word>();
 	private int mCountAllWords = 0;
+	private boolean mIsDictionaryListViewCreated = false;
 
 	private Button mTranslateBtn;
 	private Button mAddBtn;
@@ -56,9 +60,26 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			try {
+
 				Word w = new Word(mWordEdit.getText().toString(), mTranslatedWordView.getText().toString());
 				mDbHelper.insertWord(w);
-				mAdapter.insert(w, 0);
+
+				if (!mIsDictionaryListViewCreated) {
+					mWords = mDbHelper.selectWords();
+					//Log.e(TAG, "Create list view in add button click");
+					createListView();
+				}
+//				mAdapter.insert(w, 0);
+
+				mWords.addAll(mDbHelper.selectWords());
+
+				//TESTING
+				String wd = "";
+				for (int i=0; i<mWords.size(); i++) {
+					wd += mWords.get(i).getWord();
+				}
+				Log.e(TAG, "SELECT Words " + wd);
+
 				mAdapter.notifyDataSetChanged();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -77,12 +98,14 @@ public class MainActivity extends Activity {
 		public void onScroll(AbsListView view, int firstVisibleItem,
 		                     int visibleItemCount, int totalItemCount) {
 			//check if position of listview is in bottom
-			if (mDictionaryListView.getLastVisiblePosition() == mDictionaryListView.getCount() - 1
-					&& mDictionaryListView.getChildAt(mDictionaryListView.getChildCount() - 1).getBottom()
-					<= mDictionaryListView.getHeight()) {
-				if (mDictionaryListView.getCount() < mCountAllWords) {
-					mAdapter.addAll(mDbHelper.selectWords());
-					mAdapter.notifyDataSetChanged();
+			if (mDictionaryListView.getChildCount() > 0) {
+				if (mDictionaryListView.getLastVisiblePosition() == mDictionaryListView.getCount() - 1
+						&& mDictionaryListView.getChildAt(mDictionaryListView.getChildCount() - 1).getBottom()
+						<= mDictionaryListView.getHeight()) {
+					if (mDictionaryListView.getCount() < mCountAllWords) {
+						mAdapter.addAll(mDbHelper.selectWords());
+						mAdapter.notifyDataSetChanged();
+					}
 				}
 			}
 		}
@@ -99,11 +122,15 @@ public class MainActivity extends Activity {
 
 		mDbHelper = DBHelper.getInstance(this);
 		mCountAllWords = mDbHelper.getCountOfWords();
+		Log.e(TAG, Integer.toString(mCountAllWords) + " Count of words when created");
 		if (mCountAllWords > 0) {
+
 			mWords.addAll(mDbHelper.selectWords());
 			createListView();
-			mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
+
 		}
+
+
 
 		mTranslateBtn = (Button) findViewById(R.id.translate_button);
 		mTranslateBtn.setOnClickListener(mTranslateBtnClick);
@@ -157,10 +184,13 @@ public class MainActivity extends Activity {
 	}
 
 	private void createListView() {
+
 		mDictionaryListView = (ListView) findViewById(R.id.dictionary_list_view);
 		mAdapter = new WordsAdapter(this, mWords);
 		mDictionaryListView.setAdapter(mAdapter);
 		mDictionaryListView.setOnItemClickListener(mDictionaryItemClickListener);
+		mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
+		mIsDictionaryListViewCreated=true;
 	}
 
 	private String translate(final String word) {

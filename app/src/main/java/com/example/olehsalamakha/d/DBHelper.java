@@ -15,9 +15,13 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
+
+import com.google.api.translate.Translate;
 
 public class DBHelper extends  SQLiteOpenHelper {
 
+	static final String TAG = "DBhelper";
 	public static final String DATABASENAME = "DBWords";
 	public static final String WORDTABLENAME = "Words";
 	public static final String TRANSLATIONSTABLENAME = "Translations";
@@ -39,7 +43,7 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("CREATE TABLE Words (id INTEGER PRIMARY KEY AUTOINCREMENT, word text, count_answer integer, count_valid_answer integer);");
+		db.execSQL("CREATE TABLE Words (id INTEGER PRIMARY KEY AUTOINCREMENT, word text UNIQUE, count_answer integer, count_valid_answer integer);");
 		db.execSQL("create table Translations (id INTEGER PRIMARY KEY AUTOINCREMENT, id_word integer,  translation text);");
 
 	}
@@ -51,7 +55,20 @@ public class DBHelper extends  SQLiteOpenHelper {
 		onCreate(db);
 	}
 
+	public Boolean deleteWord(String word) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery("Select id FROM " + WORDTABLENAME + " WHERE word='"+word+"'", null);
+		cursor.moveToFirst();
 
+		int id = cursor.getInt(0);
+
+//		db.execSQL("delete * FROM " + WORDTABLENAME + " Where word='" + word+"';");
+		mCountSelectedWords -=1;
+		db.delete(TRANSLATIONSTABLENAME, "id_word='"+Integer.toString(id)+"'", null);
+		db.delete(WORDTABLENAME, "word='" + word+"'", null);
+
+		return true;
+	}
 	public Boolean insertWord(Word word) throws SQLException {
 		String w = word.getWord();
 		int countAnswer = word.getCountAnswer();
@@ -86,6 +103,7 @@ public class DBHelper extends  SQLiteOpenHelper {
 		return true;
 	}
 
+
 	public int getCountOfWords() {
 		String countQuery = "SELECT COUNT(*) FROM " + WORDTABLENAME;
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -114,6 +132,12 @@ public class DBHelper extends  SQLiteOpenHelper {
 		}
 		mCountSelectedWords += cursor.getCount();
 
+		String wd = "";
+		for (int i=0; i<words.size(); i++) {
+			wd+= words.get(i).getWord();
+		}
+		Log.e(TAG, "DBHELPER offset: " + Integer.toString(mCountSelectedWords));
+		Log.e(TAG, "DBhelper select: " + wd);
 		return words;
 	}
 
