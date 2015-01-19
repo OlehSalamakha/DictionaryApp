@@ -1,6 +1,8 @@
 package com.example.olehsalamakha.d;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,13 +27,15 @@ public class WordsAdapter extends ArrayAdapter {
 	private LayoutInflater mInflater;
 	private ArrayList<Word> mWords;
 	private WordsAdapter mWordsAdapter=null;
-
+	private AlertDialog mDialog;
+	private int mPosition;
 	public WordsAdapter(Activity activity, ArrayList<Word> words) {
 		super(activity, R.layout.word_layout, words);
 
 		mWords = words;
 		mInflater = activity.getWindow().getLayoutInflater();
 		mWordsAdapter = this;
+		createDialog();
 	}
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
@@ -54,23 +58,46 @@ public class WordsAdapter extends ArrayAdapter {
 
 
 		final int p = position;
+		mPosition = position;
 		Button btnd = (Button) v.findViewById(R.id.RemoveWordButton);
 		btnd.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String word = mWords.get(p).getWord();
-				DBHelper dbHelper = DBHelper.getInstance(v.getContext());
-				Log.e(TAG, "Delete word: " + word);
-				dbHelper.deleteWord(word);
-				mWords.remove(position);
-				mWordsAdapter.notifyDataSetChanged();
-
-
+				mDialog.show();
 			}
 		});
 
 		return v;
 
+	}
+
+	private void createDialog() {
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+		dialogBuilder = new AlertDialog.Builder(getContext());
+		dialogBuilder.setMessage("Do you want to delete this word?");
+		dialogBuilder.setTitle("Delete word");
+		dialogBuilder.setPositiveButton("Ok",  new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+
+				String word = mWords.get(mPosition).getWord();
+				DBHelper dbHelper = DBHelper.getInstance(getContext());
+				Log.e(TAG, "Delete word: " + word);
+				dbHelper.deleteWord(word);
+
+				mWords.remove(mPosition);
+				mWordsAdapter.notifyDataSetChanged();
+			}});
+
+
+		dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+
+			}
+		});
+
+		mDialog = dialogBuilder.create();
 	}
 
 	@Override
