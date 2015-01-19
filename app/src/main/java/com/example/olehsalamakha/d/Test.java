@@ -29,9 +29,12 @@ public class Test {
 		}
 		Question q = mQuestions.get(currentQuestion);
 		Log.e(TAG, "getCurrentQuestion");
-		currentQuestion += 1;
 		return q;
 
+	}
+
+	public void goToNextQuestion() {
+		currentQuestion += 1;
 	}
 
 	public boolean checkAnswer(int index, String answer) {

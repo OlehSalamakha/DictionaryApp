@@ -3,6 +3,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,11 +13,14 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TabHost;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
+
 import android.widget.TextView;
 import org.xml.sax.SAXException;
 
@@ -44,7 +48,8 @@ public class MainActivity extends Activity {
 	private final Context mContext = this;
 
 	private TextView mWordTestView;
-	private TextView mTranslationTestView;
+	private RadioButton mRadioButtonTest1;
+	private RadioButton mRadioButtonTest2;
 	private Button mOkButtonTest;
 	private Button mNextbuttonTest;
 
@@ -135,11 +140,13 @@ public class MainActivity extends Activity {
 			if (tabId.equals("Test")) {
 				mTest = TestBuilder.createTest(mContext);
 
-				Question q = mTest.getCurrentQuestion();
-				if (q != null) {
-					mWordTestView.setText(q.getword().getWord());
-					mTranslationTestView.setText(q.getVariant());
-				}
+//				Question q = mTest.getCurrentQuestion();
+//				if (q != null) {
+//					mWordTestView.setText(q.getword().getWord());
+//					mTranslationTestView.setText(q.getVariant());
+//				}
+
+				fillTestLayout();
 
 			}
 		}
@@ -149,11 +156,43 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Log.e(TAG, "Click next button");
+			mRadioButtonTest1.setChecked(false);
+			mRadioButtonTest2.setChecked(false);
+//			Question q = mTest.getCurrentQuestion();
+			fillTestLayout();
+			mTest.goToNextQuestion();
+
+		}
+	};
+
+	private View.OnClickListener mOkButtonTestListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			TextView tView = (TextView) findViewById(R.id.status_test_view);
 			Question q = mTest.getCurrentQuestion();
+
 			if (q != null) {
-				mWordTestView.setText(q.getword().getWord());
-				mTranslationTestView.setText(q.getVariant());
+				String answer = "";
+				if (mRadioButtonTest2.isChecked()) {
+					answer = mRadioButtonTest2.getText().toString();
+				} else {
+					answer = mRadioButtonTest1.getText().toString();
+				}
+				if (q.checkQuestion(answer)) {
+
+					tView.setText("true");
+				} else {
+					tView.setText("false");
+				}
+
+
+//			Question q = mTest.getCurrentQuestion();
+				mTest.goToNextQuestion();
+				mRadioButtonTest1.setChecked(false);
+				mRadioButtonTest2.setChecked(false);
+				fillTestLayout();
 			}
+
 		}
 	};
 
@@ -191,14 +230,17 @@ public class MainActivity extends Activity {
 		mTranslatedWordView = (TextView) findViewById(R.id.translated_word_view);
 
 		mWordTestView = (TextView) findViewById(R.id.test_word_view);
-		mTranslationTestView = (TextView) findViewById(R.id.test_variants_view);
+
+		mRadioButtonTest1 = (RadioButton) findViewById(R.id.variant_test_radio_btn1);
+		mRadioButtonTest2 = (RadioButton) findViewById(R.id.variant_test_radio_btn2);
+
 		mOkButtonTest = (Button) findViewById(R.id.confirm_button);
+		mOkButtonTest.setOnClickListener(mOkButtonTestListener);
 		mNextbuttonTest = (Button) findViewById(R.id.next_button);
 		mNextbuttonTest.setOnClickListener(mNextButtonTestListener);
 
 		mTabhost.setOnTabChangedListener(mTabChangeListener);
 
-		//TestBuilder.createTest(this);
 	}
 
 	@Override
@@ -220,6 +262,25 @@ public class MainActivity extends Activity {
 //		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+
+
+	public void onRadioButtonClicked(View view) {
+		// Is the button now checked?
+		boolean checked = ((RadioButton) view).isChecked();
+
+		// Check which radio button was clicked
+		switch(view.getId()) {
+			case R.id.variant_test_radio_btn1:
+				if (checked)
+					// Pirates are the best
+					break;
+			case R.id.variant_test_radio_btn2:
+				if (checked)
+					// Ninjas rule
+					break;
+		}
 	}
 
 
@@ -275,6 +336,25 @@ public class MainActivity extends Activity {
 		}
 
 		return t.getTranslatedWord();
+	}
+
+
+	private void fillTestLayout() {
+		Question q = mTest.getCurrentQuestion();
+		if (q != null) {
+			mWordTestView.setText(q.getword().getWord());
+			Random r = new Random();
+			int indexRadionButton = r.nextInt(1);
+
+			switch (indexRadionButton) {
+				case 0: mRadioButtonTest1.setText(q.getword().getTranslations().get(0));
+					mRadioButtonTest2.setText(q.getVariant());
+					break;
+				case 1:  mRadioButtonTest1.setText(q.getVariant());
+					mRadioButtonTest2.setText(q.getword().getWord());
+			}
+			//mTranslationTestView.setText(q.getVariant());
+		}
 	}
 
 
