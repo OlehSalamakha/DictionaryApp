@@ -1,5 +1,7 @@
 package com.example.olehsalamakha.d;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -37,6 +39,14 @@ public class MainActivity extends Activity {
 	private Button mAddBtn;
 	private EditText mWordEdit;
 	private TextView mTranslatedWordView;
+
+	private Test mTest;
+	private final Context mContext = this;
+
+	private TextView mWordTestView;
+	private TextView mTranslationTestView;
+	private Button mOkButtonTest;
+	private Button mNextbuttonTest;
 
 	private AdapterView.OnItemClickListener mDictionaryItemClickListener =
 			new AdapterView.OnItemClickListener() {
@@ -111,6 +121,42 @@ public class MainActivity extends Activity {
 		}
 	};
 
+	private View.OnClickListener mCreateTestClick = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Log.e(TAG, "test click");
+			TestBuilder.createTest(v.getContext());
+		}
+	};
+
+	private TabHost.OnTabChangeListener mTabChangeListener = new TabHost.OnTabChangeListener() {
+		@Override
+		public void onTabChanged(String tabId) {
+			if (tabId.equals("Test")) {
+				mTest = TestBuilder.createTest(mContext);
+
+				Question q = mTest.getCurrentQuestion();
+				if (q != null) {
+					mWordTestView.setText(q.getword().getWord());
+					mTranslationTestView.setText(q.getVariant());
+				}
+
+			}
+		}
+	};
+
+	private View.OnClickListener mNextButtonTestListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			Log.e(TAG, "Click next button");
+			Question q = mTest.getCurrentQuestion();
+			if (q != null) {
+				mWordTestView.setText(q.getword().getWord());
+				mTranslationTestView.setText(q.getVariant());
+			}
+		}
+	};
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +176,6 @@ public class MainActivity extends Activity {
 
 		}
 
-
-
 		mTranslateBtn = (Button) findViewById(R.id.translate_button);
 		mTranslateBtn.setOnClickListener(mTranslateBtnClick);
 
@@ -141,9 +185,20 @@ public class MainActivity extends Activity {
 		mWordEdit = (EditText) findViewById(R.id.word_edit_text);
 		mWordEdit.setText("pen");
 
+		Button testButton = (Button) findViewById(R.id.create_test);
+		testButton.setOnClickListener(mCreateTestClick);
+
 		mTranslatedWordView = (TextView) findViewById(R.id.translated_word_view);
 
+		mWordTestView = (TextView) findViewById(R.id.test_word_view);
+		mTranslationTestView = (TextView) findViewById(R.id.test_variants_view);
+		mOkButtonTest = (Button) findViewById(R.id.confirm_button);
+		mNextbuttonTest = (Button) findViewById(R.id.next_button);
+		mNextbuttonTest.setOnClickListener(mNextButtonTestListener);
 
+		mTabhost.setOnTabChangedListener(mTabChangeListener);
+
+		//TestBuilder.createTest(this);
 	}
 
 	@Override

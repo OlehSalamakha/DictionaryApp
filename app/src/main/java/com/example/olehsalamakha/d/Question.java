@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class Question {
 	private Word mWord;
-	private ArrayList<String> mVariants;
+	private ArrayList<String> mVariants = new ArrayList<>();
 
 	public Question() {
 
@@ -17,6 +17,11 @@ public class Question {
 	public Question(Word word, ArrayList<String> variants) {
 		mWord = word;
 		mVariants = variants;
+	}
+
+	public Question(Word word, String variant) {
+		mWord = word;
+		mVariants.add(variant);
 	}
 
 
@@ -38,5 +43,9 @@ public class Question {
 
 	public Word getword() {
 		return mWord;
+	}
+
+	public String getVariant() {
+		return mVariants.get(0);
 	}
 }

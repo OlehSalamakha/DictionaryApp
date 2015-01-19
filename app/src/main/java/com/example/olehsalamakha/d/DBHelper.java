@@ -141,6 +141,25 @@ public class DBHelper extends  SQLiteOpenHelper {
 		return words;
 	}
 
+	public ArrayList<Word> getLastWords(int count) {
+		String query = "SELECT * FROM " + WORDTABLENAME + " ORDER BY id DESC LIMIT " + Integer.toString(count);
+		Cursor cursor = select(query);
+		ArrayList<Word> words = new ArrayList<Word>();
+
+		while (cursor.moveToNext()) {
+			int idWord = cursor.getInt(0);
+			String word =cursor.getString(1);
+			int countAnswer = cursor.getInt(2);
+			int countValidAnswer = cursor.getInt(3);
+			ArrayList<String> translations = selectTranslations(idWord);
+
+			words.add(new Word(word, translations, countAnswer, countValidAnswer));
+		}
+
+		return words;
+
+	}
+
 	private static ArrayList<String> selectTranslations(int idWord) {
 		String query = "SELECT * FROM " + TRANSLATIONSTABLENAME + " WHERE " + "id_word=" + Integer.toString(idWord);
 		Cursor cursor = select(query);
@@ -158,5 +177,9 @@ public class DBHelper extends  SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(query, null);
 		return cursor;
 	}
+
+
+
+
 
 }

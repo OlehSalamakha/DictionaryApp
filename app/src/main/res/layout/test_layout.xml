@@ -5,16 +5,26 @@
               android:layout_height="match_parent">
 
 	<TextView
-		android:id="@+id/testView"
+		android:id="@+id/test_word_view"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="asdaDDSSADASDASDfasdf"/>
+		android:text=""/>
+
+	<TextView
+		android:id="@+id/test_variants_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
 
 	<Button
-		android:layout_width="25dp"
-		android:layout_height="25dp"
-		android:background="@drawable/round_button"
-		android:gravity="center_vertical|center_horizontal"
-		android:text="hello"
+		android:id="@+id/confirm_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="OK"
 		android:textColor="#fff" />
+
+	<Button
+		android:id="@+id/next_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Next"/>
 </LinearLayout>
