@@ -192,6 +192,18 @@ public class DBHelper extends  SQLiteOpenHelper {
 		return cursor;
 	}
 
+	public ArrayList<String> selectAllWord() {
+		ArrayList<String> result = new ArrayList<>();
+		String query = "SELECT word FROM " + WORDTABLENAME;
+		Cursor cursor = select(query);
+
+		while (cursor.moveToNext()) {
+			result.add(cursor.getString(0));
+		}
+
+		return result;
+	}
+
 
 
 
