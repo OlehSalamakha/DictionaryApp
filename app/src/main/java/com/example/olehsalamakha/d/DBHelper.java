@@ -26,7 +26,7 @@ public class DBHelper extends  SQLiteOpenHelper {
 	public static final String WORDTABLENAME = "Words";
 	public static final String TRANSLATIONSTABLENAME = "Translations";
 
-	private int mCountSelectedWords = 0;
+	 int mCountSelectedWords = 0;
 	private static DBHelper mDbHelper = null;
 	public static DBHelper getInstance(Context context) {
 		if (mDbHelper == null) {
@@ -168,6 +168,10 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		return db.update(WORDTABLENAME, values, "Word='"+word.getWord()+"'",null);
+	}
+
+	public void refresh() {
+		mCountSelectedWords = 0;
 	}
 
 	private static ArrayList<String> selectTranslations(int idWord) {

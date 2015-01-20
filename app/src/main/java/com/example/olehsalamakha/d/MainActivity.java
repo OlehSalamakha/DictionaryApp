@@ -1,10 +1,7 @@
 package com.example.olehsalamakha.d;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -154,40 +151,42 @@ public class MainActivity extends Activity {
 	private View.OnClickListener mOkButtonTestListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			TextView tView = (TextView) findViewById(R.id.status_test_view);
-			Question q = mTest.getCurrentQuestion();
-			Word w = q.getword();
+			if (!mTest.isTestFinished()) {
+				TextView tView = (TextView) findViewById(R.id.status_test_view);
+				Question q = mTest.getmCurrentQuestion();
+				Word w = q.getword();
 
-			if (q != null) {
-				String answer = "";
-				if (mRadioButtonTest2.isChecked()) {
-					answer = mRadioButtonTest2.getText().toString();
-				} else {
-					answer = mRadioButtonTest1.getText().toString();
-				}
-				if (q.checkQuestion(answer)) {
-					tView.setText("true");
-					w.setCountAnswer(w.getCountAnswer()+1);
-					w.setCountValidanswer(w.getCountValidAnswer()+1);
-
-
-				} else {
-					w.setCountAnswer(w.getCountAnswer()+1);
-					tView.setText("false");
-				}
-
-				for (int i=0; i<mWords.size(); i++) {
-					if (w.getWord().equals(mWords.get(i).getWord())) {
-						mWords.get(i).setCountValidanswer(w.getCountValidAnswer());
-						mWords.get(i).setCountAnswer(w.getCountAnswer());
-						mAdapter.notifyDataSetChanged();
-						break;
+				if (q != null) {
+					String answer = "";
+					if (mRadioButtonTest2.isChecked()) {
+						answer = mRadioButtonTest2.getText().toString();
+					} else {
+						answer = mRadioButtonTest1.getText().toString();
 					}
-				}
+					if (q.checkQuestion(answer)) {
+						tView.setText("true");
+						w.setCountAnswer(w.getCountAnswer() + 1);
+						w.setCountValidanswer(w.getCountValidAnswer() + 1);
 
-				mDbHelper.update(w);
-				mOkButtonTest.setEnabled(false);
-				fillTestLayout();
+
+					} else {
+						w.setCountAnswer(w.getCountAnswer() + 1);
+						tView.setText("false");
+					}
+
+					for (int i = 0; i < mWords.size(); i++) {
+						if (w.getWord().equals(mWords.get(i).getWord())) {
+							mWords.get(i).setCountValidanswer(w.getCountValidAnswer());
+							mWords.get(i).setCountAnswer(w.getCountAnswer());
+							mAdapter.notifyDataSetChanged();
+							break;
+						}
+					}
+
+					mDbHelper.update(w);
+					mOkButtonTest.setEnabled(false);
+//				fillTestLayout();
+				}
 			}
 		}
 	};
@@ -200,14 +199,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		createTabHost();
 
-		mDbHelper = DBHelper.getInstance(this);
-		mCountAllWords = mDbHelper.getCountOfWords();
-		Log.e(TAG, Integer.toString(mCountAllWords) + " Count of words when created");
 
-		if (mCountAllWords > 0) {
-			mWords.addAll(mDbHelper.selectWords());
-			createListView();
-		}
 
 		mTranslateBtn = (Button) findViewById(R.id.translate_button);
 		mTranslateBtn.setOnClickListener(mTranslateBtnClick);
@@ -216,9 +208,6 @@ public class MainActivity extends Activity {
 		mAddBtn.setOnClickListener(mAddBtnClick);
 
 		mWordEdit = (EditText) findViewById(R.id.word_edit_text);
-
-		Button testButton = (Button) findViewById(R.id.create_test);
-		testButton.setOnClickListener(mCreateTestClick);
 
 		mTranslatedWordView = (TextView) findViewById(R.id.translated_word_view);
 		mWordTestView = (TextView) findViewById(R.id.test_word_view);
@@ -232,12 +221,10 @@ public class MainActivity extends Activity {
 		mNextbuttonTest.setOnClickListener(mNextButtonTestListener);
 
 		mTabhost.setOnTabChangedListener(mTabChangeListener);
-
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		return true;
 	}
 
@@ -247,6 +234,20 @@ public class MainActivity extends Activity {
 	}
 
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		mDbHelper = DBHelper.getInstance(this);
+		mDbHelper.refresh();
+		mDbHelper = DBHelper.getInstance(this);
+		mCountAllWords = mDbHelper.getCountOfWords();
+		Log.e(TAG, Integer.toString(mCountAllWords) + " Count of words when created");
+
+		if (mCountAllWords > 0) {
+			mWords.addAll(mDbHelper.selectWords());
+			createListView();
+		}
+	}
 
 	public void onRadioButtonClicked(View view) {
 		// Is the button now checked?
@@ -301,12 +302,12 @@ public class MainActivity extends Activity {
 				try {
 					t.translate(word);
 				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
+					Log.e(TAG, "ParseConfigurationException in translate method");
 
 				} catch (SAXException e) {
-					e.printStackTrace();
+					Log.e(TAG, "SAXException in translate method");
 				} catch (IOException e) {
-					e.printStackTrace();
+					Log.e(TAG, "IOEXception in translate method");
 				}
 			}
 		});
@@ -315,7 +316,7 @@ public class MainActivity extends Activity {
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Log.e(TAG, "InterruptedException in translate method");
 		}
 
 		return t.getTranslatedWord();
@@ -323,18 +324,18 @@ public class MainActivity extends Activity {
 
 
 	private void fillTestLayout() {
-		Question q = mTest.getCurrentQuestion();
+		Question q = mTest.getmCurrentQuestion();
 		if (q != null) {
 			mWordTestView.setText(q.getword().getWord());
 			Random r = new Random();
-			int indexRadionButton = r.nextInt(1);
+			int indexRadionButton = r.nextInt(2);
 
 			switch (indexRadionButton) {
 				case 0: mRadioButtonTest1.setText(q.getword().getTranslations().get(0));
 					mRadioButtonTest2.setText(q.getVariant());
 					break;
 				case 1:  mRadioButtonTest1.setText(q.getVariant());
-					mRadioButtonTest2.setText(q.getword().getWord());
+					mRadioButtonTest2.setText(q.getword().getTranslations().get(0));
 			}
 		}
 	}
