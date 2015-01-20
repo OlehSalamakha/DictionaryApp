@@ -144,6 +144,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			mTest.goToNextQuestion();
+			mOkButtonTest.setEnabled(true);
 			fillTestLayout();
 
 
@@ -169,11 +170,23 @@ public class MainActivity extends Activity {
 					w.setCountAnswer(w.getCountAnswer()+1);
 					w.setCountValidanswer(w.getCountValidAnswer()+1);
 
+
 				} else {
 					w.setCountAnswer(w.getCountAnswer()+1);
 					tView.setText("false");
 				}
+
+				for (int i=0; i<mWords.size(); i++) {
+					if (w.getWord().equals(mWords.get(i).getWord())) {
+						mWords.get(i).setCountValidanswer(w.getCountValidAnswer());
+						mWords.get(i).setCountAnswer(w.getCountAnswer());
+						mAdapter.notifyDataSetChanged();
+						break;
+					}
+				}
+
 				mDbHelper.update(w);
+				mOkButtonTest.setEnabled(false);
 				fillTestLayout();
 			}
 		}
@@ -190,11 +203,10 @@ public class MainActivity extends Activity {
 		mDbHelper = DBHelper.getInstance(this);
 		mCountAllWords = mDbHelper.getCountOfWords();
 		Log.e(TAG, Integer.toString(mCountAllWords) + " Count of words when created");
-		if (mCountAllWords > 0) {
 
+		if (mCountAllWords > 0) {
 			mWords.addAll(mDbHelper.selectWords());
 			createListView();
-
 		}
 
 		mTranslateBtn = (Button) findViewById(R.id.translate_button);

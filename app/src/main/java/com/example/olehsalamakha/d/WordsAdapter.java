@@ -2,6 +2,7 @@ package com.example.olehsalamakha.d;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,14 +60,17 @@ public class WordsAdapter extends ArrayAdapter {
 
 		final int p = position;
 		mPosition = position;
-		Button btnd = (Button) v.findViewById(R.id.RemoveWordButton);
+		final Button btnd = (Button) v.findViewById(R.id.RemoveWordButton);
+		btnd.setTag(position);
 		btnd.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+			    mPosition = (int) btnd.getTag();
+				Log.e(TAG, "posigion: "+Integer.toString(mPosition));
 				mDialog.show();
+
 			}
 		});
-
 		return v;
 
 	}
