@@ -1,5 +1,6 @@
 package com.example.olehsalamakha.d;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ public class MainActivity extends Activity {
 
 	static final String TAG = "MainActivity";
 
+	private  boolean mDeleteWord = false;
+
 	private TabHost mTabhost;
 	private ListView mDictionaryListView;
 	private WordsAdapter mAdapter;
@@ -52,6 +55,8 @@ public class MainActivity extends Activity {
 	private RadioButton mRadioButtonTest2;
 	private Button mOkButtonTest;
 	private Button mNextbuttonTest;
+
+
 
 	private AdapterView.OnItemClickListener mDictionaryItemClickListener =
 			new AdapterView.OnItemClickListener() {
@@ -84,17 +89,8 @@ public class MainActivity extends Activity {
 					//Log.e(TAG, "Create list view in add button click");
 					createListView();
 				}
-//				mAdapter.insert(w, 0);
 
 				mWords.addAll(mDbHelper.selectWords());
-
-				//TESTING
-				String wd = "";
-				for (int i=0; i<mWords.size(); i++) {
-					wd += mWords.get(i).getWord();
-				}
-				Log.e(TAG, "SELECT Words " + wd);
-
 				mAdapter.notifyDataSetChanged();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -129,7 +125,6 @@ public class MainActivity extends Activity {
 	private View.OnClickListener mCreateTestClick = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			Log.e(TAG, "test click");
 			TestBuilder.createTest(v.getContext());
 		}
 	};
@@ -139,13 +134,6 @@ public class MainActivity extends Activity {
 		public void onTabChanged(String tabId) {
 			if (tabId.equals("Test")) {
 				mTest = TestBuilder.createTest(mContext);
-
-//				Question q = mTest.getCurrentQuestion();
-//				if (q != null) {
-//					mWordTestView.setText(q.getword().getWord());
-//					mTranslationTestView.setText(q.getVariant());
-//				}
-
 				fillTestLayout();
 
 			}
@@ -155,12 +143,9 @@ public class MainActivity extends Activity {
 	private View.OnClickListener mNextButtonTestListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			Log.e(TAG, "Click next button");
-			mRadioButtonTest1.setChecked(false);
-			mRadioButtonTest2.setChecked(false);
-//			Question q = mTest.getCurrentQuestion();
-			fillTestLayout();
 			mTest.goToNextQuestion();
+			fillTestLayout();
+
 
 		}
 	};
@@ -179,17 +164,12 @@ public class MainActivity extends Activity {
 					answer = mRadioButtonTest1.getText().toString();
 				}
 				if (q.checkQuestion(answer)) {
-
 					tView.setText("true");
 				} else {
 					tView.setText("false");
 				}
 
 
-//			Question q = mTest.getCurrentQuestion();
-				mTest.goToNextQuestion();
-				mRadioButtonTest1.setChecked(false);
-				mRadioButtonTest2.setChecked(false);
 				fillTestLayout();
 			}
 
@@ -202,7 +182,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-
 		createTabHost();
 
 		mDbHelper = DBHelper.getInstance(this);
@@ -222,13 +201,11 @@ public class MainActivity extends Activity {
 		mAddBtn.setOnClickListener(mAddBtnClick);
 
 		mWordEdit = (EditText) findViewById(R.id.word_edit_text);
-		mWordEdit.setText("pen");
 
 		Button testButton = (Button) findViewById(R.id.create_test);
 		testButton.setOnClickListener(mCreateTestClick);
 
 		mTranslatedWordView = (TextView) findViewById(R.id.translated_word_view);
-
 		mWordTestView = (TextView) findViewById(R.id.test_word_view);
 
 		mRadioButtonTest1 = (RadioButton) findViewById(R.id.variant_test_radio_btn1);
@@ -251,17 +228,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up round_button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-
-		//noinspection SimplifiableIfStatement
-//		if (id == R.id.action_settings) {
-//			return true;
-//		}
-
-		return super.onOptionsItemSelected(item);
+		return true;
 	}
 
 
@@ -275,10 +242,12 @@ public class MainActivity extends Activity {
 			case R.id.variant_test_radio_btn1:
 				if (checked)
 					// Pirates are the best
+					Log.e(TAG, "button1 clicked");
 					break;
 			case R.id.variant_test_radio_btn2:
 				if (checked)
 					// Ninjas rule
+					Log.e(TAG, "button2 clicked");
 					break;
 		}
 	}
@@ -300,7 +269,6 @@ public class MainActivity extends Activity {
 	}
 
 	private void createListView() {
-
 		mDictionaryListView = (ListView) findViewById(R.id.dictionary_list_view);
 		mAdapter = new WordsAdapter(this, mWords);
 		mDictionaryListView.setAdapter(mAdapter);
@@ -353,10 +321,8 @@ public class MainActivity extends Activity {
 				case 1:  mRadioButtonTest1.setText(q.getVariant());
 					mRadioButtonTest2.setText(q.getword().getWord());
 			}
-			//mTranslationTestView.setText(q.getVariant());
 		}
 	}
-
 
 
 }
