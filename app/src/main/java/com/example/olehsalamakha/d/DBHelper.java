@@ -160,8 +160,18 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 	}
 
+	public int update(Word word) {
+		ContentValues values = new ContentValues();
+		values.put("count_answer",word.getCountAnswer());
+		Log.e(TAG, values.getAsString("count_answer"));
+		values.put("count_valid_answer",word.getCountValidAnswer());
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		return db.update(WORDTABLENAME, values, "Word='"+word.getWord()+"'",null);
+	}
+
 	private static ArrayList<String> selectTranslations(int idWord) {
-		String query = "SELECT * FROM " + TRANSLATIONSTABLENAME + " WHERE " + "id_word=" + Integer.toString(idWord);
+		String query = "SELECT * FROM " + TRANSLATIONSTABLENAME + " WHERE " + "id_word= " + Integer.toString(idWord);
 		Cursor cursor = select(query);
 
 		ArrayList<String> translations = new ArrayList<String>();
@@ -177,6 +187,8 @@ public class DBHelper extends  SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(query, null);
 		return cursor;
 	}
+
+
 
 
 

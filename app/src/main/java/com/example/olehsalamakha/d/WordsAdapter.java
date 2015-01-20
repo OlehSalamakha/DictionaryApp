@@ -92,8 +92,6 @@ public class WordsAdapter extends ArrayAdapter {
 		dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-
-
 			}
 		});
 

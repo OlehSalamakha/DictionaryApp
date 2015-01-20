@@ -155,6 +155,7 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			TextView tView = (TextView) findViewById(R.id.status_test_view);
 			Question q = mTest.getCurrentQuestion();
+			Word w = q.getword();
 
 			if (q != null) {
 				String answer = "";
@@ -165,14 +166,16 @@ public class MainActivity extends Activity {
 				}
 				if (q.checkQuestion(answer)) {
 					tView.setText("true");
+					w.setCountAnswer(w.getCountAnswer()+1);
+					w.setCountValidanswer(w.getCountValidAnswer()+1);
+
 				} else {
+					w.setCountAnswer(w.getCountAnswer()+1);
 					tView.setText("false");
 				}
-
-
+				mDbHelper.update(w);
 				fillTestLayout();
 			}
-
 		}
 	};
 
