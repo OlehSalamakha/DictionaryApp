@@ -29,10 +29,19 @@ public class DBHelper extends  SQLiteOpenHelper {
 	 int mCountSelectedWords = 0;
 	private static DBHelper mDbHelper = null;
 	public static DBHelper getInstance(Context context) {
+		Log.d(TAG, "Get instance DBhelper begin");
 		if (mDbHelper == null) {
-			mDbHelper = new DBHelper(context);
+
+
+
+			synchronized (DBHelper.class){
+				if (mDbHelper == null) {
+					mDbHelper = new DBHelper(context);
+				}
+			}
 		}
 
+		Log.d(TAG, "Get instance DBhelper end");
 		return mDbHelper;
 	}
 
@@ -43,8 +52,11 @@ public class DBHelper extends  SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+
+		Log.e(TAG, "Create database");
 		db.execSQL("CREATE TABLE Words (id INTEGER PRIMARY KEY AUTOINCREMENT, word text UNIQUE, count_answer integer, count_valid_answer integer);");
 		db.execSQL("create table Translations (id INTEGER PRIMARY KEY AUTOINCREMENT, id_word integer,  translation text);");
+
 
 	}
 
@@ -136,8 +148,6 @@ public class DBHelper extends  SQLiteOpenHelper {
 		for (int i=0; i<words.size(); i++) {
 			wd+= words.get(i).getWord();
 		}
-		Log.e(TAG, "DBHELPER offset: " + Integer.toString(mCountSelectedWords));
-		Log.e(TAG, "DBhelper select: " + wd);
 		return words;
 	}
 
@@ -163,7 +173,6 @@ public class DBHelper extends  SQLiteOpenHelper {
 	public int update(Word word) {
 		ContentValues values = new ContentValues();
 		values.put("count_answer",word.getCountAnswer());
-		Log.e(TAG, values.getAsString("count_answer"));
 		values.put("count_valid_answer",word.getCountValidAnswer());
 
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -204,10 +213,26 @@ public class DBHelper extends  SQLiteOpenHelper {
 		return result;
 	}
 
+	public Word selectWord(String word) {
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = select("SELECT * FROM "+WORDTABLENAME + " Where word='"+word+"'");
+		cursor.moveToFirst();
+		int id = cursor.getInt(0);
+		ArrayList<String> translations = selectTranslations(id);
 
+		Word w = new Word(word, translations, cursor.getInt(2), cursor.getInt(3));
+		return w;
 
+	}
 
-
-
-
+	@Override
+	public SQLiteDatabase getWritableDatabase() {
+		Log.d(TAG, "begin GetWriteableDB");
+		SQLiteDatabase db = super.getWritableDatabase();
+		if (db == null) {
+			Log.d(TAG, "database is null");
+		}
+		Log.d(TAG, "end GetWriteblaDB");
+		return db;
+	}
 }

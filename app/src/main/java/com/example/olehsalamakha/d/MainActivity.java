@@ -1,16 +1,24 @@
 package com.example.olehsalamakha.d;
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.RadioButton;
 import android.widget.TabHost;
 
@@ -20,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,19 +39,16 @@ public class MainActivity extends Activity {
 
 	static final String TAG = "MainActivity";
 
-	private  boolean mDeleteWord = false;
+	private DataController mDataController = DataController.getInstance(this, this);
 
 	private TabHost mTabhost;
 	private ListView mDictionaryListView;
-	private WordsAdapter mAdapter;
-	private DBHelper mDbHelper;
-	private ArrayList<Word> mWords = new ArrayList<Word>();
+
 	private int mCountAllWords = 0;
 	private boolean mIsDictionaryListViewCreated = false;
 
-	private Button mTranslateBtn;
 	private Button mAddBtn;
-	private EditText mWordEdit;
+	private AutoCompleteTextView mWordEdit;
 	private TextView mTranslatedWordView;
 
 	private Test mTest;
@@ -53,6 +60,8 @@ public class MainActivity extends Activity {
 	private Button mOkButtonTest;
 	private Button mNextbuttonTest;
 
+	private Dialog mAddDialog;
+	private Dialog mWordInfromationDialog;
 
 
 	private AdapterView.OnItemClickListener mDictionaryItemClickListener =
@@ -76,22 +85,38 @@ public class MainActivity extends Activity {
 	private View.OnClickListener mAddBtnClick = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			try {
+			String w = mWordEdit.getText().toString();
+			final TextView tView = (TextView) mAddDialog.findViewById(R.id.add_word_text_view);
+			final EditText eText = (EditText) mAddDialog.findViewById(R.id.add_word_edit_text);
+			tView.setText(w);
 
-				Word w = new Word(mWordEdit.getText().toString(), mTranslatedWordView.getText().toString());
-				mDbHelper.insertWord(w);
-
-				if (!mIsDictionaryListViewCreated) {
-					mWords = mDbHelper.selectWords();
-					//Log.e(TAG, "Create list view in add button click");
-					createListView();
+			Button translateBtn = (Button) mAddDialog.findViewById(R.id.add_word_translate_button);
+			translateBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					String translatedWord = translate(tView.getText().toString());
+					eText.setText(translatedWord);
 				}
+			});
 
-				mWords.addAll(mDbHelper.selectWords());
-				mAdapter.notifyDataSetChanged();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			Button addBtn = (Button) mAddDialog.findViewById(R.id.add_word_ok_button);
+			addBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Word word = new Word(tView.getText().toString(), eText.getText().toString());
+						mDataController.addWordtoDb(word);
+						mWordEdit.setAdapter(mDataController.getSearchAdapter());
+
+						if (!mIsDictionaryListViewCreated) {
+							mDataController.initializeDictAdapter();
+							Log.e(TAG, "create list view");
+							createListView();
+						}
+						mDataController.addWordstoList();
+						mAddDialog.dismiss();
+				}
+			});
+			mAddDialog.show();
 		}
 	};
 
@@ -105,14 +130,12 @@ public class MainActivity extends Activity {
 		@Override
 		public void onScroll(AbsListView view, int firstVisibleItem,
 		                     int visibleItemCount, int totalItemCount) {
-			//check if position of listview is in bottom
 			if (mDictionaryListView.getChildCount() > 0) {
 				if (mDictionaryListView.getLastVisiblePosition() == mDictionaryListView.getCount() - 1
 						&& mDictionaryListView.getChildAt(mDictionaryListView.getChildCount() - 1).getBottom()
 						<= mDictionaryListView.getHeight()) {
 					if (mDictionaryListView.getCount() < mCountAllWords) {
-						mAdapter.addAll(mDbHelper.selectWords());
-						mAdapter.notifyDataSetChanged();
+						mDataController.addDataToDictAdapter();
 					}
 				}
 			}
@@ -144,6 +167,8 @@ public class MainActivity extends Activity {
 			mOkButtonTest.setEnabled(true);
 			fillTestLayout();
 
+//			startActivity(new Intent(v.getContext(), TestActivity.class));
+
 
 		}
 	};
@@ -167,25 +192,14 @@ public class MainActivity extends Activity {
 						tView.setText("true");
 						w.setCountAnswer(w.getCountAnswer() + 1);
 						w.setCountValidanswer(w.getCountValidAnswer() + 1);
-
-
 					} else {
 						w.setCountAnswer(w.getCountAnswer() + 1);
 						tView.setText("false");
 					}
 
-					for (int i = 0; i < mWords.size(); i++) {
-						if (w.getWord().equals(mWords.get(i).getWord())) {
-							mWords.get(i).setCountValidanswer(w.getCountValidAnswer());
-							mWords.get(i).setCountAnswer(w.getCountAnswer());
-							mAdapter.notifyDataSetChanged();
-							break;
-						}
-					}
-
-					mDbHelper.update(w);
+					mDataController.updateWord(w);
 					mOkButtonTest.setEnabled(false);
-//				fillTestLayout();
+
 				}
 			}
 		}
@@ -199,17 +213,36 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		createTabHost();
 
-
-
-		mTranslateBtn = (Button) findViewById(R.id.translate_button);
-		mTranslateBtn.setOnClickListener(mTranslateBtnClick);
-
 		mAddBtn = (Button) findViewById(R.id.add_button);
 		mAddBtn.setOnClickListener(mAddBtnClick);
 
-		mWordEdit = (EditText) findViewById(R.id.word_edit_text);
+		mWordEdit = (AutoCompleteTextView) findViewById(R.id.word_edit_text);
 
-		mTranslatedWordView = (TextView) findViewById(R.id.translated_word_view);
+		mDataController.initializeSearchAdapter();
+		mWordEdit.setAdapter(mDataController.getSearchAdapter());
+
+
+		mWordEdit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				//get word in pistion where user clicked
+				String word = mDataController.getSearchAdapter().getItem(position);
+
+				Word w = mDataController.getWord(word);
+
+				TextView wordTextView = (TextView) mWordInfromationDialog.findViewById(R.id.word_information_text_view);
+				wordTextView.setText(w.getWord());
+
+				TextView translationTextView = (TextView) mWordInfromationDialog.findViewById(R.id.word_translation_information_text_view);
+				translationTextView.setText(w.getTranslations().get(0));
+
+				TextView additionalInformationTextView = (TextView) mWordInfromationDialog.findViewById(R.id.word_additional_information_text_view);
+				additionalInformationTextView.setText("Passed "+Integer.toString(w.getCountAnswer())+"/"+Integer.toString(w.getCountValidAnswer()));
+				mWordInfromationDialog.show();
+
+			}
+		});
+
 		mWordTestView = (TextView) findViewById(R.id.test_word_view);
 
 		mRadioButtonTest1 = (RadioButton) findViewById(R.id.variant_test_radio_btn1);
@@ -221,6 +254,9 @@ public class MainActivity extends Activity {
 		mNextbuttonTest.setOnClickListener(mNextButtonTestListener);
 
 		mTabhost.setOnTabChangedListener(mTabChangeListener);
+
+		createAddDialog();
+		createInformationDialog();
 	}
 
 	@Override
@@ -237,14 +273,11 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		mDbHelper = DBHelper.getInstance(this);
-		mDbHelper.refresh();
-		mDbHelper = DBHelper.getInstance(this);
-		mCountAllWords = mDbHelper.getCountOfWords();
-		Log.e(TAG, Integer.toString(mCountAllWords) + " Count of words when created");
+		mDataController.refreshDB();
 
-		if (mCountAllWords > 0) {
-			mWords.addAll(mDbHelper.selectWords());
+
+		if (mDataController.getCountAllWords() > 0) {
+			mDataController.initializeDictAdapter();
 			createListView();
 		}
 	}
@@ -258,12 +291,12 @@ public class MainActivity extends Activity {
 			case R.id.variant_test_radio_btn1:
 				if (checked)
 					// Pirates are the best
-					Log.e(TAG, "button1 clicked");
+
 					break;
 			case R.id.variant_test_radio_btn2:
 				if (checked)
 					// Ninjas rule
-					Log.e(TAG, "button2 clicked");
+
 					break;
 		}
 	}
@@ -286,8 +319,8 @@ public class MainActivity extends Activity {
 
 	private void createListView() {
 		mDictionaryListView = (ListView) findViewById(R.id.dictionary_list_view);
-		mAdapter = new WordsAdapter(this, mWords);
-		mDictionaryListView.setAdapter(mAdapter);
+
+		mDictionaryListView.setAdapter(mDataController.getDictionaryAdapter());
 		mDictionaryListView.setOnItemClickListener(mDictionaryItemClickListener);
 		mDictionaryListView.setOnScrollListener(mDictionaryScrollListener);
 		mIsDictionaryListViewCreated=true;
@@ -302,12 +335,11 @@ public class MainActivity extends Activity {
 				try {
 					t.translate(word);
 				} catch (ParserConfigurationException e) {
-					Log.e(TAG, "ParseConfigurationException in translate method");
+
 
 				} catch (SAXException e) {
-					Log.e(TAG, "SAXException in translate method");
+
 				} catch (IOException e) {
-					Log.e(TAG, "IOEXception in translate method");
 				}
 			}
 		});
@@ -316,7 +348,7 @@ public class MainActivity extends Activity {
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			Log.e(TAG, "InterruptedException in translate method");
+
 		}
 
 		return t.getTranslatedWord();
@@ -338,6 +370,19 @@ public class MainActivity extends Activity {
 					mRadioButtonTest2.setText(q.getword().getTranslations().get(0));
 			}
 		}
+	}
+
+	private void createAddDialog() {
+		mAddDialog = new Dialog(this);
+		mAddDialog.setContentView(R.layout.add_dialog_layout);
+		mAddDialog.setTitle("Add Word");
+
+	}
+
+	private void createInformationDialog() {
+		mWordInfromationDialog = new Dialog(this);
+		mWordInfromationDialog.setContentView(R.layout.word_information_dialog_layout);
+		mWordInfromationDialog.setTitle("Information");
 	}
 
 
